@@ -1055,8 +1055,12 @@
       const rows = [];
       Array.from(sheetDoc.getElementsByTagName("row")).forEach(rowNode => {
         const row = [];
+        let nextIndex = 0;
         Array.from(rowNode.getElementsByTagName("c")).forEach(cell => {
-          row[columnIndex(cell.getAttribute("r") || "")] = parseCellValue(cell, sharedStrings);
+          const ref = cell.getAttribute("r");
+          const index = ref ? columnIndex(ref) : nextIndex;
+          row[index] = parseCellValue(cell, sharedStrings);
+          nextIndex = index + 1;
         });
         rows.push(Array.from({ length: row.length }, (_, index) => row[index] ?? ""));
       });
