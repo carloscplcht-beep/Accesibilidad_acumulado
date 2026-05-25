@@ -672,7 +672,7 @@
     <section class="kpi-grid" aria-label="Indicadores principales">
       <article class="kpi"><span>Demora media</span><strong id="kpiMean">-</strong><small id="kpiMeanSub">Días medios en el periodo filtrado</small></article>
       <article class="kpi"><span>Última fecha</span><strong id="kpiLatest">-</strong><small id="kpiLatestSub">Media del último corte visible</small></article>
-      <article class="kpi"><span>Evolución</span><strong id="kpiDelta">-</strong><small id="kpiDeltaSub">Último corte frente al primer corte visible</small></article>
+      <article class="kpi"><span>Evolución mensual</span><strong id="kpiDelta">-</strong><small id="kpiDeltaSub">Mes inicial frente a mes final</small></article>
       <article class="kpi"><span>% 0-3 días</span><strong id="kpi03">-</strong><small id="kpi03Sub">Porcentaje acumulado oficial</small></article>
       <article class="kpi"><span>% 7 o más días</span><strong id="kpi7">-</strong><small id="kpi7Sub">Observaciones con demora elevada</small></article>
     </section>
@@ -1209,6 +1209,42 @@
       });
     }
 
+    function nonDateFilteredRows() {
+      const zones = getMultiValues("zoneFilter");
+      const centers = getMultiValues("centerFilter");
+      const professionals = getMultiValues("professionalFilter");
+      const cat = $("categoryFilter").value;
+      const visit = $("visitFilter").value;
+      return RAW_DATA.filter((row) => {
+        if (zones.length && !zones.includes(row.zona)) return false;
+        if (centers.length && !centers.includes(row.centro)) return false;
+        if (professionals.length && !professionals.includes(`${row.profesional} · ${row.cias}`)) return false;
+        if (cat !== "Todas" && row.categoria !== cat) return false;
+        if (visit !== "Todos" && row.tipo !== visit) return false;
+        return true;
+      });
+    }
+
+    function monthlyEvolutionComparison() {
+      const from = $("fromDate").value || META.dateMin;
+      const to = $("toDate").value || META.dateMax;
+      if (!from || !to) return null;
+      const baseRows = nonDateFilteredRows();
+      const startMonth = monthStart(from);
+      const startEnd = nextMonthStart(from);
+      const endMonth = monthStart(to);
+      const endLimit = nextDay(to);
+      const startRows = baseRows.filter(row => row.fecha >= startMonth && row.fecha < startEnd);
+      const endRows = baseRows.filter(row => row.fecha >= endMonth && row.fecha < endLimit);
+      if (!startRows.length || !endRows.length) return null;
+      return {
+        startMean: mean(startRows),
+        endMean: mean(endRows),
+        startLabel: monthLabel(from),
+        endLabel: `${monthLabel(to)} hasta ${dayLabel(to)}`
+      };
+    }
+
     function render() {
       const rows = filteredRows();
       if (!rows.length) {
@@ -1237,22 +1273,22 @@
       ["kpiMean", "kpiLatest", "kpiDelta", "kpi03", "kpi7"].forEach(id => $(id).textContent = "-");
       $("kpiMeanSub").textContent = RAW_DATA.length ? "Días medios en el periodo filtrado" : "Pendiente de carga de Excel";
       $("kpiLatestSub").textContent = RAW_DATA.length ? "Media del último corte visible" : "Pendiente de carga de Excel";
-      $("kpiDeltaSub").textContent = RAW_DATA.length ? "Último corte frente al primer corte visible" : "Pendiente de carga de Excel";
+      $("kpiDeltaSub").textContent = RAW_DATA.length ? "Mes inicial frente a mes final" : "Pendiente de carga de Excel";
       $("kpi03Sub").textContent = RAW_DATA.length ? "Porcentaje acumulado oficial" : "Pendiente de carga de Excel";
       $("kpi7Sub").textContent = RAW_DATA.length ? "Observaciones con demora elevada" : "Pendiente de carga de Excel";
     }
 
     function renderKpis(rows) {
       const daily = dailySeries(rows);
-      const first = daily[0];
       const last = daily[daily.length - 1];
-      const delta = last.mean - first.mean;
+      const evolution = monthlyEvolutionComparison();
+      const delta = evolution ? evolution.endMean - evolution.startMean : 0;
       $("kpiMean").textContent = `${fmt.format(mean(rows))} d`;
       $("kpiLatest").textContent = `${fmt.format(last.mean)} d`;
       $("kpiLatestSub").textContent = `Corte ${dayLabel(last.date)}`;
-      $("kpiDelta").textContent = `${delta >= 0 ? "+" : ""}${fmt.format(delta)} d`;
+      $("kpiDelta").textContent = evolution ? `${delta >= 0 ? "+" : ""}${fmt.format(delta)} d` : "-";
       $("kpiDelta").style.color = delta <= 0 ? "var(--green)" : "var(--red)";
-      $("kpiDeltaSub").textContent = `${dayLabel(first.date)} a ${dayLabel(last.date)}`;
+      $("kpiDeltaSub").textContent = evolution ? `${evolution.startLabel}: ${fmt.format(evolution.startMean)} d · ${evolution.endLabel}: ${fmt.format(evolution.endMean)} d` : "Sin datos suficientes para comparar meses";
       $("kpi03").textContent = `${pctFmt.format(percent(rows, r => r.dias <= 3))}%`;
       $("kpi7").textContent = `${pctFmt.format(percent(rows, r => r.dias >= 7))}%`;
       $("kpi03Sub").textContent = `Accesibilidad acumulada hasta 3 días`;
@@ -1557,6 +1593,26 @@
 
     function shortLabel(label) {
       return label.length > 13 ? `${label.slice(0, 12)}.` : label;
+    }
+
+    function monthStart(dateString) {
+      return `${dateString.slice(0, 7)}-01`;
+    }
+
+    function nextMonthStart(dateString) {
+      const date = parseDate(monthStart(dateString));
+      date.setMonth(date.getMonth() + 1);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function nextDay(dateString) {
+      const date = parseDate(dateString);
+      date.setDate(date.getDate() + 1);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function monthLabel(dateString) {
+      return new Intl.DateTimeFormat("es-ES", { month: "short", year: "numeric" }).format(parseDate(dateString));
     }
 
     function weekKey(dateString) {
