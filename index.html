@@ -337,20 +337,47 @@
       color: #064c43;
     }
 
+    .kpi-sections {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-box {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(23, 35, 60, 0.06);
+      min-width: 0;
+    }
+
+    .kpi-box h2 {
+      margin: 0 0 14px;
+      font-size: 17px;
+      color: var(--ink);
+    }
+
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(140px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
+      grid-template-columns: repeat(var(--kpi-cols, 5), minmax(118px, 1fr));
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f7f9fc;
     }
 
     .kpi {
       background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: 8px;
       padding: 14px;
-      box-shadow: 0 8px 24px rgba(23, 35, 60, 0.06);
       min-height: 118px;
+      border-right: 1px solid var(--line);
+    }
+
+    .kpi:last-child {
+      border-right: 0;
     }
 
     .kpi span {
@@ -364,10 +391,10 @@
 
     .kpi strong {
       display: block;
-      font-size: 32px;
+      font-size: 30px;
       color: var(--ink);
-      line-height: 1;
-      white-space: nowrap;
+      line-height: 1.08;
+      white-space: normal;
     }
 
     .kpi small {
@@ -592,7 +619,10 @@
 
     @media (max-width: 1160px) {
       .filters { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+      .kpi-sections { grid-template-columns: 1fr; }
       .kpi-grid { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+      .kpi { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .kpi:nth-child(3n) { border-right: 0; }
       .layout { grid-template-columns: 1fr; }
     }
 
@@ -603,7 +633,10 @@
       .loader-band { grid-template-columns: 1fr; }
       .file-actions { justify-content: flex-start; }
       .filters { grid-template-columns: 1fr; }
+      .kpi-sections { grid-template-columns: 1fr; }
       .kpi-grid { grid-template-columns: 1fr; }
+      .kpi { border-right: 0; border-bottom: 1px solid var(--line); }
+      .kpi:last-child { border-bottom: 0; }
       .bar-row { grid-template-columns: 96px minmax(0, 1fr) 58px; }
       .chart { height: 280px; }
     }
@@ -669,12 +702,26 @@
       </div>
     </section>
 
-    <section class="kpi-grid" aria-label="Indicadores principales">
-      <article class="kpi"><span>Demora media</span><strong id="kpiMean">-</strong><small id="kpiMeanSub">Días medios en el periodo filtrado</small></article>
-      <article class="kpi"><span>Última fecha</span><strong id="kpiLatest">-</strong><small id="kpiLatestSub">Media del último corte visible</small></article>
-      <article id="evolutionKpi" class="kpi" title="Compara la demora media del mes inicial con la demora media del mes final, usando el mes final completo o parcial si aún no ha terminado."><span>Evolución mensual</span><strong id="kpiDelta">-</strong><small id="kpiDeltaSub">Mes final del filtro frente al mes inicial del filtro</small></article>
-      <article class="kpi"><span>% 0-3 días</span><strong id="kpi03">-</strong><small id="kpi03Sub">Porcentaje acumulado oficial</small></article>
-      <article class="kpi"><span>% 7 o más días</span><strong id="kpi7">-</strong><small id="kpi7Sub">Observaciones con demora elevada</small></article>
+    <section class="kpi-sections" aria-label="Indicadores principales">
+      <article class="kpi-box">
+        <h2>Resumen del periodo seleccionado</h2>
+        <div class="kpi-grid" style="--kpi-cols: 5">
+          <div class="kpi"><span>Demora media</span><strong id="kpiMean">-</strong><small id="kpiMeanSub">Del periodo seleccionado</small></div>
+          <div class="kpi"><span>% 0-2 días</span><strong id="kpi02">-</strong><small id="kpi02Sub">Accesibilidad acumulada hasta 2 días</small></div>
+          <div class="kpi"><span>% 0-3 días</span><strong id="kpi03">-</strong><small id="kpi03Sub">Accesibilidad acumulada hasta 3 días</small></div>
+          <div class="kpi"><span>% 0-6 días</span><strong id="kpi06">-</strong><small id="kpi06Sub">Accesibilidad acumulada hasta 6 días</small></div>
+          <div class="kpi"><span>% 7 o más días</span><strong id="kpi7">-</strong><small id="kpi7Sub">Proporción en demora elevada</small></div>
+        </div>
+      </article>
+
+      <article class="kpi-box">
+        <h2>Evolución mensual</h2>
+        <div class="kpi-grid" style="--kpi-cols: 3">
+          <div class="kpi"><span>Media mes inicial</span><strong id="kpiStartMonth">-</strong><small id="kpiStartMonthSub">Mes del corte inicial</small></div>
+          <div class="kpi"><span>Última fecha seleccionada</span><strong id="kpiLatest">-</strong><small id="kpiLatestSub">Corte DD/MM/AAAA</small></div>
+          <div id="evolutionKpi" class="kpi" title="Compara la demora media del mes inicial con la demora media del mes final, usando el mes final completo o parcial si aún no ha terminado."><span>Evolución mensual</span><strong id="kpiDelta">-</strong><small id="kpiDeltaSub">Mes final del filtro frente al mes inicial del filtro</small></div>
+        </div>
+      </article>
     </section>
 
     <section class="layout">
@@ -1233,6 +1280,54 @@
       };
     }
 
+    function calculateKpiMetrics(rows) {
+      const daily = dailySeries(rows);
+      const first = daily[0] || null;
+      const last = daily[daily.length - 1] || null;
+      const evolution = monthlyEvolutionComparison(rows);
+      return {
+        numeroRegistrosFiltrados: rows.length,
+        fechaInicialFiltrada: first ? first.date : "",
+        fechaFinalFiltrada: last ? last.date : "",
+        mediaPeriodo: mean(rows),
+        mediaPrimeraFechaSeleccionada: first ? first.mean : null,
+        mediaUltimaFechaSeleccionada: last ? last.mean : null,
+        mediaMesInicial: evolution ? evolution.startMean : null,
+        mediaMesFinal: evolution ? evolution.endMean : null,
+        evolucionDias: evolution ? evolution.delta : null,
+        evolucionPorcentaje: evolution ? evolution.percentage : null,
+        mismoMes: Boolean(evolution && evolution.sameMonth),
+        porcentaje02: percent(rows, r => r.dias >= 0 && r.dias <= 2),
+        porcentaje03: percent(rows, r => r.dias >= 0 && r.dias <= 3),
+        porcentaje06: percent(rows, r => r.dias >= 0 && r.dias <= 6),
+        porcentaje7Mas: percent(rows, r => r.dias >= 7),
+        evolution
+      };
+    }
+
+    function validateKpiCalculations() {
+      const rows = filteredRows();
+      const metrics = calculateKpiMetrics(rows);
+      const output = {
+        numeroRegistrosFiltrados: metrics.numeroRegistrosFiltrados,
+        fechaInicialFiltrada: metrics.fechaInicialFiltrada,
+        fechaFinalFiltrada: metrics.fechaFinalFiltrada,
+        mediaPeriodo: metrics.mediaPeriodo,
+        mediaPrimeraFechaSeleccionada: metrics.mediaPrimeraFechaSeleccionada,
+        mediaUltimaFechaSeleccionada: metrics.mediaUltimaFechaSeleccionada,
+        mediaMesInicial: metrics.mediaMesInicial,
+        mediaMesFinal: metrics.mediaMesFinal,
+        evolucionDias: metrics.evolucionDias,
+        evolucionPorcentaje: metrics.evolucionPorcentaje,
+        porcentaje02: metrics.porcentaje02,
+        porcentaje03: metrics.porcentaje03,
+        porcentaje06: metrics.porcentaje06,
+        porcentaje7Mas: metrics.porcentaje7Mas
+      };
+      console.table(output);
+      return output;
+    }
+
     function runMonthlyEvolutionSelfTest() {
       const rows = [
         { fecha: "2026-02-01", dias: 100, categoria: "A", tipo: "T", cias: "1", profesional: "P1", centro: "C", zona: "Z" },
@@ -1279,31 +1374,46 @@
       $("comboBars").innerHTML = `<div class="empty">${message}</div>`;
       $("heatmap").innerHTML = `<div class="empty" style="grid-column:1/-1">${message}</div>`;
       $("rankingBody").innerHTML = "";
-      ["kpiMean", "kpiLatest", "kpiDelta", "kpi03", "kpi7"].forEach(id => $(id).textContent = "-");
-      $("kpiMeanSub").textContent = RAW_DATA.length ? "Días medios en el periodo filtrado" : "Pendiente de carga de Excel";
-      $("kpiLatestSub").textContent = RAW_DATA.length ? "Media del último corte visible" : "Pendiente de carga de Excel";
+      ["kpiMean", "kpi02", "kpi03", "kpi06", "kpi7", "kpiStartMonth", "kpiLatest", "kpiDelta"].forEach(id => $(id).textContent = "-");
+      $("kpiMeanSub").textContent = "Del periodo seleccionado";
+      $("kpi02Sub").textContent = "Accesibilidad acumulada hasta 2 días";
+      $("kpi03Sub").textContent = "Accesibilidad acumulada hasta 3 días";
+      $("kpi06Sub").textContent = "Accesibilidad acumulada hasta 6 días";
+      $("kpi7Sub").textContent = "Proporción en demora elevada";
+      $("kpiStartMonthSub").textContent = "Mes del corte inicial";
+      $("kpiLatestSub").textContent = RAW_DATA.length ? "Corte DD/MM/AAAA" : "Corte DD/MM/AAAA";
       $("kpiDeltaSub").textContent = RAW_DATA.length ? "Mes final del filtro frente al mes inicial del filtro" : "Pendiente de carga de Excel";
       $("evolutionKpi").title = "Compara la demora media del mes inicial con la demora media del mes final, usando el mes final completo o parcial si aún no ha terminado.";
-      $("kpi03Sub").textContent = RAW_DATA.length ? "Porcentaje acumulado oficial" : "Pendiente de carga de Excel";
-      $("kpi7Sub").textContent = RAW_DATA.length ? "Observaciones con demora elevada" : "Pendiente de carga de Excel";
     }
 
     function renderKpis(rows) {
-      const daily = dailySeries(rows);
-      const last = daily[daily.length - 1];
-      const evolution = monthlyEvolutionComparison(rows);
+      const metrics = calculateKpiMetrics(rows);
+      const evolution = metrics.evolution;
       const delta = evolution ? evolution.delta : 0;
-      $("kpiMean").textContent = `${fmt.format(mean(rows))} d`;
-      $("kpiLatest").textContent = `${fmt.format(last.mean)} d`;
-      $("kpiLatestSub").textContent = `Corte ${dayLabel(last.date)}`;
-      $("kpiDelta").textContent = evolution ? formatEvolutionValue(evolution) : "-";
-      $("kpiDelta").style.color = delta <= 0 ? "var(--green)" : "var(--red)";
+      $("kpiMean").textContent = `${fmt.format(metrics.mediaPeriodo)} d`;
+      $("kpiMeanSub").textContent = "Del periodo seleccionado";
+      $("kpi02").textContent = `${pctFmt.format(metrics.porcentaje02)}%`;
+      $("kpi02Sub").textContent = "Accesibilidad acumulada hasta 2 días";
+      $("kpi03").textContent = `${pctFmt.format(metrics.porcentaje03)}%`;
+      $("kpi03Sub").textContent = "Accesibilidad acumulada hasta 3 días";
+      $("kpi06").textContent = `${pctFmt.format(metrics.porcentaje06)}%`;
+      $("kpi06Sub").textContent = "Accesibilidad acumulada hasta 6 días";
+      $("kpi7").textContent = `${pctFmt.format(metrics.porcentaje7Mas)}%`;
+      $("kpi7Sub").textContent = "Proporción en demora elevada";
+      $("kpiStartMonth").textContent = evolution ? `${fmt.format(evolution.startMean)} d` : "No calculable";
+      $("kpiStartMonthSub").textContent = "Mes del corte inicial";
+      $("kpiLatest").textContent = metrics.mediaUltimaFechaSeleccionada !== null ? `${fmt.format(metrics.mediaUltimaFechaSeleccionada)} d` : "-";
+      $("kpiLatestSub").textContent = metrics.fechaFinalFiltrada ? `Corte ${dayLabel(metrics.fechaFinalFiltrada)}` : "Corte DD/MM/AAAA";
+      $("kpiDelta").textContent = evolution ? formatEvolutionValue(evolution) : "No calculable";
+      $("kpiDelta").style.color = evolution ? evolutionColor(delta) : "var(--ink)";
       $("kpiDeltaSub").textContent = evolution ? formatEvolutionSubtext(evolution) : "No calculable";
       $("evolutionKpi").title = evolution ? formatEvolutionHelp(evolution) : "Compara la demora media del mes inicial con la demora media del mes final, usando el mes final completo o parcial si aún no ha terminado.";
-      $("kpi03").textContent = `${pctFmt.format(percent(rows, r => r.dias <= 3))}%`;
-      $("kpi7").textContent = `${pctFmt.format(percent(rows, r => r.dias >= 7))}%`;
-      $("kpi03Sub").textContent = `Accesibilidad acumulada hasta 3 días`;
-      $("kpi7Sub").textContent = `Proporción en demora elevada`;
+    }
+
+    function evolutionColor(delta) {
+      if (delta < 0) return "var(--green)";
+      if (delta > 0) return "var(--red)";
+      return "var(--ink)";
     }
 
     function formatEvolutionValue(evolution) {
@@ -1684,6 +1794,7 @@
 
     window.addEventListener("resize", debounce(render, 160));
     runMonthlyEvolutionSelfTest();
+    window.validateKpiCalculations = validateKpiCalculations;
     setupFilters();
     render();
   </script>
