@@ -337,6 +337,33 @@
       color: #064c43;
     }
 
+    .tab-nav {
+      display: inline-flex;
+      background: #e8eef5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 18px;
+      gap: 4px;
+    }
+
+    .tab-nav button {
+      min-height: 36px;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0 14px;
+    }
+
+    .tab-nav button.active {
+      background: var(--white);
+      color: var(--navy);
+      box-shadow: 0 6px 16px rgba(23, 35, 60, 0.08);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
     .kpi-sections {
       display: grid;
       grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
@@ -402,6 +429,134 @@
       color: var(--muted);
       margin-top: 10px;
       line-height: 1.35;
+    }
+
+    .comparison-controls {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .comparison-controls h2 {
+      margin: 0 0 12px;
+      font-size: 17px;
+      color: var(--ink);
+    }
+
+    .comparison-control-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .comparison-summary {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .comparison-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfe;
+      min-height: 128px;
+    }
+
+    .comparison-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .comparison-card strong {
+      display: block;
+      font-size: 24px;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .comparison-card small {
+      display: block;
+      color: var(--muted);
+      line-height: 1.35;
+      margin-top: 8px;
+    }
+
+    .delta-good { color: var(--green) !important; }
+    .delta-bad { color: var(--red) !important; }
+    .delta-neutral { color: var(--muted) !important; }
+
+    .status-pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #eef2f7;
+      color: var(--muted);
+    }
+
+    .status-pill.good {
+      background: #e5f5eb;
+      color: var(--green);
+    }
+
+    .status-pill.bad {
+      background: #fdecef;
+      color: var(--red);
+    }
+
+    .partial-tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #fff3cd;
+      color: #8a5a00;
+      font-size: 11px;
+      font-weight: 800;
+      vertical-align: middle;
+    }
+
+    .insight-box {
+      border: 1px solid #b9eadf;
+      border-left: 5px solid var(--teal);
+      border-radius: 8px;
+      background: #f0faf7;
+      padding: 12px 14px;
+      color: #0f5f55;
+      line-height: 1.45;
+    }
+
+    .insight-box p {
+      margin: 0 0 8px;
+    }
+
+    .insight-box p:last-child { margin-bottom: 0; }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+      gap: 18px;
+    }
+
+    .comparison-section { margin-top: 18px; }
+
+    .comparison-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0 12px;
     }
 
     .layout {
@@ -623,6 +778,9 @@
       .kpi-grid { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
       .kpi { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
       .kpi:nth-child(3n) { border-right: 0; }
+      .comparison-control-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .comparison-summary { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+      .comparison-grid { grid-template-columns: 1fr; }
       .layout { grid-template-columns: 1fr; }
     }
 
@@ -637,6 +795,9 @@
       .kpi-grid { grid-template-columns: 1fr; }
       .kpi { border-right: 0; border-bottom: 1px solid var(--line); }
       .kpi:last-child { border-bottom: 0; }
+      .tab-nav { display: grid; grid-template-columns: 1fr; width: 100%; }
+      .comparison-control-grid { grid-template-columns: 1fr; }
+      .comparison-summary { grid-template-columns: 1fr; }
       .bar-row { grid-template-columns: 96px minmax(0, 1fr) 58px; }
       .chart { height: 280px; }
     }
@@ -671,6 +832,11 @@
       <strong>Privacidad:</strong> los datos se trabajan siempre en local, dentro de este navegador. Ningún Excel se sube a la nube, a internet ni a servidores externos; todo el cálculo se realiza en el propio equipo para respetar la confidencialidad de los datos.
     </section>
 
+    <nav class="tab-nav" aria-label="Vistas del dashboard">
+      <button id="generalTab" type="button" class="active">Dashboard general</button>
+      <button id="monthlyTab" type="button">Comparativa mensual</button>
+    </nav>
+
     <section class="filters" aria-label="Filtros del dashboard">
       <div class="filter-field">
         <span class="field-label">Zona básica de salud</span>
@@ -702,6 +868,7 @@
       </div>
     </section>
 
+    <section id="generalView" class="tab-panel active" aria-label="Dashboard general">
     <section class="kpi-sections" aria-label="Indicadores principales">
       <article class="kpi-box">
         <h2>Resumen del periodo seleccionado</h2>
@@ -817,6 +984,183 @@
         </div>
       </article>
     </section>
+    </section>
+
+    <section id="monthlyView" class="tab-panel" aria-label="Comparativa mensual">
+      <section class="comparison-controls" aria-label="Controles de comparativa mensual">
+        <h2>Comparativa mensual</h2>
+        <div class="comparison-control-grid">
+          <label>Mes base
+            <select id="baseMonthSelect"></select>
+          </label>
+          <label>Mes comparado
+            <select id="comparedMonthSelect"></select>
+          </label>
+          <label>Métrica principal
+            <select id="monthlyMetricSelect">
+              <option value="mean">Demora media</option>
+              <option value="p02">% 0-2 días</option>
+              <option value="p03">% 0-3 días</option>
+              <option value="p06">% 0-6 días</option>
+              <option value="p7">% 7 o más días</option>
+              <option value="max">Demora máxima</option>
+            </select>
+          </label>
+          <label>Vista
+            <select id="comparisonViewSelect">
+              <option value="general">Comparativa general</option>
+              <option value="category">Por categoría</option>
+              <option value="visit">Por tipo de visita</option>
+              <option value="categoryVisit">Categoría + tipo de visita</option>
+              <option value="professional">Profesionales / CIAS</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <div id="monthlyComparisonEmpty" class="empty">Carga un Excel local y selecciona al menos dos meses para realizar una comparativa mensual.</div>
+
+      <div id="monthlyComparisonContent">
+        <section class="panel">
+          <h2>Resumen comparativo</h2>
+          <p id="monthComparisonLabels" class="hint"></p>
+          <div id="comparisonSummary" class="comparison-summary"></div>
+        </section>
+
+        <section class="panel comparison-section">
+          <h2>Lectura rápida</h2>
+          <div id="comparisonInsights" class="insight-box"></div>
+        </section>
+
+        <section class="comparison-grid comparison-section">
+          <article class="panel">
+            <h2>Evolución mensual</h2>
+            <p class="hint">Evolución por mes natural de la métrica seleccionada.</p>
+            <svg id="monthlyTrendChart" class="chart" role="img" aria-label="Evolución mensual de la métrica seleccionada"></svg>
+          </article>
+          <article class="panel">
+            <h2>Comparación tú a tú</h2>
+            <p class="hint">Mes base frente a mes comparado en indicadores clave.</p>
+            <svg id="headToHeadChart" class="chart" role="img" aria-label="Comparación entre mes base y mes comparado"></svg>
+          </article>
+        </section>
+
+        <section id="categoryComparisonSection" class="panel comparison-section">
+          <h2>Comparativa por categoría</h2>
+          <p class="hint">Comparación del mes base y el mes comparado por categoría profesional.</p>
+          <svg id="categoryComparisonChart" class="chart short" role="img" aria-label="Comparativa mensual por categoría"></svg>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th class="num">Media mes base</th>
+                  <th class="num">Media mes comparado</th>
+                  <th class="num">Diferencia</th>
+                  <th class="num">% variación</th>
+                  <th class="num">% 7+ base</th>
+                  <th class="num">% 7+ comparado</th>
+                  <th class="num">Dif. pp</th>
+                  <th>Lectura</th>
+                </tr>
+              </thead>
+              <tbody id="categoryComparisonBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="visitComparisonSection" class="panel comparison-section">
+          <h2>Comparativa por tipo de visita</h2>
+          <p class="hint">Comparación del mes base y el mes comparado por modalidad de visita.</p>
+          <svg id="visitComparisonChart" class="chart short" role="img" aria-label="Comparativa mensual por tipo de visita"></svg>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo de visita</th>
+                  <th class="num">Media mes base</th>
+                  <th class="num">Media mes comparado</th>
+                  <th class="num">Diferencia</th>
+                  <th class="num">% variación</th>
+                  <th class="num">% 7+ base</th>
+                  <th class="num">% 7+ comparado</th>
+                  <th>Lectura</th>
+                </tr>
+              </thead>
+              <tbody id="visitComparisonBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="categoryVisitComparisonSection" class="panel comparison-section">
+          <h2>Comparativa por categoría y tipo de visita</h2>
+          <p class="hint">Ordenada por mayor empeoramiento de demora media.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Tipo de visita</th>
+                  <th class="num">n base</th>
+                  <th class="num">n comparado</th>
+                  <th class="num">Media base</th>
+                  <th class="num">Media comparado</th>
+                  <th class="num">Diferencia</th>
+                  <th class="num">% variación</th>
+                  <th class="num">% 0-2 base</th>
+                  <th class="num">% 0-2 comparado</th>
+                  <th class="num">% 7+ base</th>
+                  <th class="num">% 7+ comparado</th>
+                  <th class="num">Máxima base</th>
+                  <th class="num">Máxima comparado</th>
+                  <th>Lectura</th>
+                </tr>
+              </thead>
+              <tbody id="categoryVisitComparisonBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="professionalComparisonSection" class="panel comparison-section">
+          <h2>Comparativa por profesional / CIAS</h2>
+          <div class="comparison-tools">
+            <label>Ordenar por
+              <select id="professionalSortSelect">
+                <option value="current">Mayor demora actual</option>
+                <option value="worsening">Mayor empeoramiento</option>
+                <option value="improvement">Mayor mejora</option>
+                <option value="p7">Mayor % 7 o más días</option>
+              </select>
+            </label>
+            <label class="toggle"><input id="showAllProfessionalsToggle" type="checkbox"> Ver todos</label>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Profesional</th>
+                  <th>CIAS</th>
+                  <th>Categoría</th>
+                  <th>Tipo de visita</th>
+                  <th class="num">n base</th>
+                  <th class="num">n comparado</th>
+                  <th class="num">Media base</th>
+                  <th class="num">Media comparado</th>
+                  <th class="num">Diferencia</th>
+                  <th class="num">% variación</th>
+                  <th class="num">% 7+ base</th>
+                  <th class="num">% 7+ comparado</th>
+                  <th class="num">Máxima base</th>
+                  <th class="num">Máxima comparado</th>
+                  <th>Lectura</th>
+                </tr>
+              </thead>
+              <tbody id="professionalComparisonBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
 
     <p class="note">
       Fuente: <span id="sourceName"></span>.
@@ -838,12 +1182,21 @@
     const dateFmt = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" });
     const longDateFmt = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
     const palette = ["#008c7a", "#1d3573", "#e5aa21", "#c73e4b", "#2f9e44", "#7c3aed"];
+    const monthlyMetricConfig = {
+      mean: { label: "Demora media", suffix: " d", type: "days", value: m => m.mean, improvesWhen: "down" },
+      p02: { label: "% 0-2 días", suffix: "%", type: "percent", value: m => m.p02, improvesWhen: "up" },
+      p03: { label: "% 0-3 días", suffix: "%", type: "percent", value: m => m.p03, improvesWhen: "up" },
+      p06: { label: "% 0-6 días", suffix: "%", type: "percent", value: m => m.p06, improvesWhen: "up" },
+      p7: { label: "% 7 o más días", suffix: "%", type: "percent", value: m => m.p7, improvesWhen: "down" },
+      max: { label: "Demora máxima", suffix: " d", type: "days", value: m => m.max, improvesWhen: "down" }
+    };
 
     const $ = (id) => document.getElementById(id);
     const mean = (rows) => rows.length ? rows.reduce((a, r) => a + r.dias, 0) / rows.length : 0;
     const percent = (rows, fn) => rows.length ? (rows.filter(fn).length / rows.length) * 100 : 0;
     const parseDate = (value) => new Date(`${value}T00:00:00`);
     const dayLabel = (value) => longDateFmt.format(parseDate(value));
+    let activeTab = "general";
 
     function groupBy(rows, keyFn) {
       const map = new Map();
@@ -863,6 +1216,8 @@
 
     function setupFilters() {
       refreshFilterOptions();
+      $("generalTab").addEventListener("click", () => setActiveTab("general"));
+      $("monthlyTab").addEventListener("click", () => setActiveTab("monthly"));
       $("applyBtn").addEventListener("click", render);
       $("resetBtn").addEventListener("click", () => {
         resetAllFilters();
@@ -880,11 +1235,23 @@
       $("granDaily").addEventListener("click", () => setGranularity("daily"));
       $("granWeekly").addEventListener("click", () => setGranularity("weekly"));
       $("smoothToggle").addEventListener("change", render);
+      ["baseMonthSelect", "comparedMonthSelect", "monthlyMetricSelect", "comparisonViewSelect", "professionalSortSelect", "showAllProfessionalsToggle"].forEach(id => {
+        $(id).addEventListener("change", () => renderMonthlyComparisonTab(filteredRows()));
+      });
       document.addEventListener("click", (event) => {
         document.querySelectorAll(".multi-select.open").forEach(el => {
           if (!el.contains(event.target)) el.classList.remove("open");
         });
       });
+    }
+
+    function setActiveTab(tabName) {
+      activeTab = tabName;
+      $("generalTab").classList.toggle("active", tabName === "general");
+      $("monthlyTab").classList.toggle("active", tabName === "monthly");
+      $("generalView").classList.toggle("active", tabName === "general");
+      $("monthlyView").classList.toggle("active", tabName === "monthly");
+      render();
     }
 
     function refreshFilterOptions() {
@@ -1328,6 +1695,512 @@
       return output;
     }
 
+    function getFilteredData() {
+      return filteredRows();
+    }
+
+    function groupByMonth(data) {
+      return groupBy(data, row => row.fecha.slice(0, 7));
+    }
+
+    function median(rows) {
+      if (!rows.length) return 0;
+      const values = rows.map(row => row.dias).sort((a, b) => a - b);
+      const mid = Math.floor(values.length / 2);
+      return values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2;
+    }
+
+    function maxDelay(rows) {
+      return rows.length ? Math.max(...rows.map(row => row.dias)) : 0;
+    }
+
+    function simpleMetrics(rows) {
+      return {
+        n: rows.length,
+        mean: mean(rows),
+        median: median(rows),
+        max: maxDelay(rows),
+        p02: percent(rows, r => r.dias >= 0 && r.dias <= 2),
+        p03: percent(rows, r => r.dias >= 0 && r.dias <= 3),
+        p06: percent(rows, r => r.dias >= 0 && r.dias <= 6),
+        p7: percent(rows, r => r.dias >= 7)
+      };
+    }
+
+    function metricsByKey(rows, keyFn) {
+      return new Map(Array.from(groupBy(rows, keyFn).entries()).map(([key, group]) => [key, simpleMetrics(group)]));
+    }
+
+    function calculateMonthlyMetrics(data) {
+      return Array.from(groupByMonth(data).entries())
+        .map(([month, rows]) => ({
+          month,
+          label: monthLabel(`${month}-01`),
+          rows,
+          partial: isPartialMonth(month, rows),
+          ...simpleMetrics(rows),
+          byCategory: metricsByKey(rows, row => row.categoria),
+          byVisit: metricsByKey(rows, row => row.tipo),
+          byCategoryVisit: metricsByKey(rows, row => `${row.categoria}|||${row.tipo}`),
+          byProfessional: metricsByKey(rows, row => `${row.profesional}|||${row.cias}|||${row.categoria}|||${row.tipo}`)
+        }))
+        .sort((a, b) => a.month.localeCompare(b.month));
+    }
+
+    function isPartialMonth(month, rows) {
+      if (!rows.length) return true;
+      const from = $("fromDate").value || META.dateMin;
+      const to = $("toDate").value || META.dateMax;
+      const start = `${month}-01`;
+      const end = monthEnd(month);
+      const dates = uniqueSorted(rows.map(row => row.fecha));
+      const firstData = dates[0];
+      const lastData = dates[dates.length - 1];
+      return (from && from.slice(0, 7) === month && from > start)
+        || (to && to.slice(0, 7) === month && to < end)
+        || firstData > start
+        || lastData < end;
+    }
+
+    function monthEnd(month) {
+      const date = parseDate(`${month}-01`);
+      date.setMonth(date.getMonth() + 1);
+      date.setDate(date.getDate() - 1);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function calculateComparisonMetrics(baseMonth, comparedMonth) {
+      if (!baseMonth || !comparedMonth) return null;
+      const metrics = ["mean", "p02", "p03", "p06", "p7", "max"];
+      const result = { baseMonth, comparedMonth, metrics: {} };
+      metrics.forEach(key => {
+        const config = monthlyMetricConfig[key];
+        const baseValue = config.value(baseMonth);
+        const comparedValue = config.value(comparedMonth);
+        const delta = comparedValue - baseValue;
+        result.metrics[key] = {
+          key,
+          label: config.label,
+          suffix: config.suffix,
+          type: config.type,
+          baseValue,
+          comparedValue,
+          delta,
+          percentage: baseValue ? (delta / baseValue) * 100 : null,
+          status: comparisonStatus(delta, config.improvesWhen)
+        };
+      });
+      return result;
+    }
+
+    function renderMonthlyComparisonTab(rows) {
+      const monthly = calculateMonthlyMetrics(rows);
+      populateMonthSelectors(monthly);
+      if (monthly.length < 2) {
+        $("monthlyComparisonEmpty").style.display = "grid";
+        $("monthlyComparisonEmpty").textContent = monthly.length === 1
+          ? "Selecciona al menos dos meses para realizar una comparativa mensual."
+          : (RAW_DATA.length ? "Sin datos para los filtros seleccionados." : "Carga un Excel local y selecciona al menos dos meses para realizar una comparativa mensual.");
+        $("monthlyComparisonContent").style.display = "none";
+        clearMonthlyComparison();
+        return;
+      }
+      $("monthlyComparisonEmpty").style.display = "none";
+      $("monthlyComparisonContent").style.display = "block";
+      const base = monthly.find(item => item.month === $("baseMonthSelect").value) || monthly[0];
+      const compared = monthly.find(item => item.month === $("comparedMonthSelect").value) || monthly[monthly.length - 1];
+      const comparison = calculateComparisonMetrics(base, compared);
+      const metricKey = $("monthlyMetricSelect").value;
+      $("monthComparisonLabels").innerHTML = `${monthWithPartial(base)} frente a ${monthWithPartial(compared)}`;
+      renderComparisonSummary(comparison);
+      renderMonthlyTrendChart(monthly, metricKey, base.month, compared.month);
+      renderHeadToHeadChart(comparison);
+      renderCategoryComparison(base, compared, metricKey);
+      renderVisitTypeComparison(base, compared, metricKey);
+      renderCategoryVisitTypeComparison(base, compared);
+      renderProfessionalComparison(base, compared);
+      renderComparisonSections();
+      generateComparisonInsights(comparison, base, compared);
+    }
+
+    function populateMonthSelectors(monthly) {
+      const options = monthly.map(item => `<option value="${item.month}">${escapeHtml(item.label)}${item.partial ? " · mes parcial" : ""}</option>`).join("");
+      const baseSelect = $("baseMonthSelect");
+      const comparedSelect = $("comparedMonthSelect");
+      const previousBase = baseSelect.value;
+      const previousCompared = comparedSelect.value;
+      baseSelect.innerHTML = options;
+      comparedSelect.innerHTML = options;
+      const months = monthly.map(item => item.month);
+      baseSelect.value = months.includes(previousBase) ? previousBase : (months[0] || "");
+      comparedSelect.value = months.includes(previousCompared) ? previousCompared : (months[months.length - 1] || "");
+    }
+
+    function clearMonthlyComparison() {
+      ["comparisonSummary", "comparisonInsights", "categoryComparisonBody", "visitComparisonBody", "categoryVisitComparisonBody", "professionalComparisonBody"].forEach(id => $(id).innerHTML = "");
+      ["monthlyTrendChart", "headToHeadChart", "categoryComparisonChart", "visitComparisonChart"].forEach(id => $(id).innerHTML = "");
+    }
+
+    function renderComparisonSummary(comparison) {
+      $("comparisonSummary").innerHTML = Object.values(comparison.metrics).map(metric => `
+        <article class="comparison-card">
+          <span>${escapeHtml(metric.label)}</span>
+          <strong>${formatComparisonDelta(metric)}</strong>
+          <small>${formatMetricValue(metric.baseValue, metric.type)}${metric.suffix} → ${formatMetricValue(metric.comparedValue, metric.type)}${metric.suffix}</small>
+          <small><span class="status-pill ${statusClass(metric.status)}">${statusText(metric.status)}</span></small>
+        </article>
+      `).join("");
+    }
+
+    function renderMonthlyTrendChart(monthly, metricKey, baseMonth, comparedMonth) {
+      const config = monthlyMetricConfig[metricKey];
+      const data = monthly.map(item => ({ label: item.label, month: item.month, value: config.value(item), partial: item.partial }));
+      drawMonthlyMetricChart($("monthlyTrendChart"), data, config, baseMonth, comparedMonth);
+    }
+
+    function renderHeadToHeadChart(comparison) {
+      drawHeadToHeadChart($("headToHeadChart"), Object.values(comparison.metrics));
+    }
+
+    function renderCategoryComparison(base, compared, metricKey) {
+      const rows = buildGroupedComparisonRows(base, compared, "byCategory").sort((a, b) => b.delta - a.delta);
+      drawGroupedComparisonChart($("categoryComparisonChart"), rows, metricKey, "Categoría");
+      $("categoryComparisonBody").innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.label)}</td>
+          <td class="num">${formatNullable(row.base.mean)} d</td>
+          <td class="num">${formatNullable(row.compared.mean)} d</td>
+          <td class="num ${deltaClass(row.delta, "down")}">${formatSigned(row.delta)} d</td>
+          <td class="num">${formatPercentVariation(row.variation)}</td>
+          <td class="num">${formatNullable(row.base.p7)}%</td>
+          <td class="num">${formatNullable(row.compared.p7)}%</td>
+          <td class="num ${deltaClass(row.compared.p7 - row.base.p7, "down")}">${formatSigned(row.compared.p7 - row.base.p7)} pp</td>
+          <td>${statusBadge(row.delta, "down")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderVisitTypeComparison(base, compared, metricKey) {
+      const rows = buildGroupedComparisonRows(base, compared, "byVisit").sort((a, b) => b.delta - a.delta);
+      drawGroupedComparisonChart($("visitComparisonChart"), rows, metricKey, "Tipo de visita");
+      $("visitComparisonBody").innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.label)}</td>
+          <td class="num">${formatNullable(row.base.mean)} d</td>
+          <td class="num">${formatNullable(row.compared.mean)} d</td>
+          <td class="num ${deltaClass(row.delta, "down")}">${formatSigned(row.delta)} d</td>
+          <td class="num">${formatPercentVariation(row.variation)}</td>
+          <td class="num">${formatNullable(row.base.p7)}%</td>
+          <td class="num">${formatNullable(row.compared.p7)}%</td>
+          <td>${statusBadge(row.delta, "down")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderCategoryVisitTypeComparison(base, compared) {
+      const rows = buildGroupedComparisonRows(base, compared, "byCategoryVisit")
+        .map(row => ({ ...row, category: row.label.split("|||")[0], visit: row.label.split("|||")[1] }))
+        .sort((a, b) => b.delta - a.delta);
+      $("categoryVisitComparisonBody").innerHTML = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.category)}</td>
+          <td>${escapeHtml(row.visit)}</td>
+          <td class="num">${intFmt.format(row.base.n)}</td>
+          <td class="num">${intFmt.format(row.compared.n)}</td>
+          <td class="num">${formatNullable(row.base.mean)} d</td>
+          <td class="num">${formatNullable(row.compared.mean)} d</td>
+          <td class="num ${deltaClass(row.delta, "down")}">${formatSigned(row.delta)} d</td>
+          <td class="num">${formatPercentVariation(row.variation)}</td>
+          <td class="num">${formatNullable(row.base.p02)}%</td>
+          <td class="num">${formatNullable(row.compared.p02)}%</td>
+          <td class="num">${formatNullable(row.base.p7)}%</td>
+          <td class="num">${formatNullable(row.compared.p7)}%</td>
+          <td class="num">${formatNullable(row.base.max)} d</td>
+          <td class="num">${formatNullable(row.compared.max)} d</td>
+          <td>${statusBadge(row.delta, "down")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderProfessionalComparison(base, compared) {
+      const sortMode = $("professionalSortSelect").value;
+      const showAll = $("showAllProfessionalsToggle").checked;
+      let rows = buildGroupedComparisonRows(base, compared, "byProfessional")
+        .map(row => {
+          const [professional, cias, category, visit] = row.label.split("|||");
+          return { ...row, professional, cias, category, visit };
+        });
+      rows = sortProfessionalRows(rows, sortMode);
+      const visible = showAll ? rows : rows.slice(0, 20);
+      $("professionalComparisonBody").innerHTML = visible.map(row => `
+        <tr>
+          <td>${escapeHtml(row.professional)}</td>
+          <td><span class="badge">${escapeHtml(row.cias)}</span></td>
+          <td>${escapeHtml(row.category)}</td>
+          <td>${escapeHtml(row.visit)}</td>
+          <td class="num">${intFmt.format(row.base.n)}</td>
+          <td class="num">${intFmt.format(row.compared.n)}</td>
+          <td class="num">${formatNullable(row.base.mean)} d</td>
+          <td class="num">${formatNullable(row.compared.mean)} d</td>
+          <td class="num ${deltaClass(row.delta, "down")}">${formatSigned(row.delta)} d</td>
+          <td class="num">${formatPercentVariation(row.variation)}</td>
+          <td class="num">${formatNullable(row.base.p7)}%</td>
+          <td class="num">${formatNullable(row.compared.p7)}%</td>
+          <td class="num">${formatNullable(row.base.max)} d</td>
+          <td class="num">${formatNullable(row.compared.max)} d</td>
+          <td>${statusBadge(row.delta, "down")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function buildGroupedComparisonRows(base, compared, mapName) {
+      const keys = Array.from(new Set([...base[mapName].keys(), ...compared[mapName].keys()])).sort((a, b) => a.localeCompare(b, "es"));
+      return keys.map(label => {
+        const baseMetrics = base[mapName].get(label) || emptyMetrics();
+        const comparedMetrics = compared[mapName].get(label) || emptyMetrics();
+        const delta = comparedMetrics.mean - baseMetrics.mean;
+        return {
+          label,
+          base: baseMetrics,
+          compared: comparedMetrics,
+          delta,
+          variation: baseMetrics.mean ? (delta / baseMetrics.mean) * 100 : null
+        };
+      });
+    }
+
+    function emptyMetrics() {
+      return { n: 0, mean: 0, median: 0, max: 0, p02: 0, p03: 0, p06: 0, p7: 0 };
+    }
+
+    function renderComparisonSections() {
+      const view = $("comparisonViewSelect").value;
+      const visible = {
+        categoryComparisonSection: view === "general" || view === "category",
+        visitComparisonSection: view === "general" || view === "visit",
+        categoryVisitComparisonSection: view === "categoryVisit",
+        professionalComparisonSection: view === "professional"
+      };
+      Object.entries(visible).forEach(([id, show]) => $(id).style.display = show ? "block" : "none");
+    }
+
+    function generateComparisonInsights(comparison, base, compared) {
+      const insights = [];
+      const meanMetric = comparison.metrics.mean;
+      if (meanMetric.delta < 0) insights.push(`La demora media mejora entre ${base.label} y ${compared.label}, con una reducción de ${fmt.format(Math.abs(meanMetric.delta))} días.`);
+      else if (meanMetric.delta > 0) insights.push(`La demora media empeora entre ${base.label} y ${compared.label}, con un aumento de ${fmt.format(meanMetric.delta)} días.`);
+      else insights.push(`La demora media no cambia entre ${base.label} y ${compared.label}.`);
+      const p7Delta = comparison.metrics.p7.delta;
+      if (p7Delta < 0) insights.push(`La proporción de citas en 7 o más días disminuye ${pctFmt.format(Math.abs(p7Delta))} puntos porcentuales.`);
+      else if (p7Delta > 0) insights.push(`La proporción de citas en 7 o más días aumenta ${pctFmt.format(p7Delta)} puntos porcentuales.`);
+      const categoryRows = buildGroupedComparisonRows(base, compared, "byCategory").sort((a, b) => b.delta - a.delta);
+      if (categoryRows.length && categoryRows[0].delta > 0) insights.push(`La categoría con mayor empeoramiento es ${categoryRows[0].label}, con +${fmt.format(categoryRows[0].delta)} días.`);
+      const visitRows = buildGroupedComparisonRows(base, compared, "byVisit").sort((a, b) => b.compared.mean - a.compared.mean);
+      if (visitRows.length) insights.push(`${visitRows[0].label} concentra la mayor demora del mes comparado, con ${fmt.format(visitRows[0].compared.mean)} días.`);
+      if (compared.n < 30) insights.push(`Interpretar con cautela: el mes comparado tiene bajo volumen de registros (${intFmt.format(compared.n)}).`);
+      $("comparisonInsights").innerHTML = insights.slice(0, 5).map(text => `<p>${escapeHtml(text)}</p>`).join("");
+    }
+
+    function validateMonthlyComparison() {
+      const rows = getFilteredData();
+      const monthly = calculateMonthlyMetrics(rows);
+      const base = monthly.find(item => item.month === $("baseMonthSelect").value) || monthly[0] || null;
+      const compared = monthly.find(item => item.month === $("comparedMonthSelect").value) || monthly[monthly.length - 1] || null;
+      const comparison = calculateComparisonMetrics(base, compared);
+      const output = {
+        filtrosActivos: activeFiltersSummary(),
+        mesesDisponibles: monthly.map(item => item.month),
+        mesBase: base?.month || "",
+        mesComparado: compared?.month || "",
+        registrosMesBase: base?.n || 0,
+        registrosMesComparado: compared?.n || 0,
+        demoraMediaMesBase: base?.mean ?? null,
+        demoraMediaMesComparado: compared?.mean ?? null,
+        demoraMaximaMesBase: base?.max ?? null,
+        demoraMaximaMesComparado: compared?.max ?? null,
+        p02MesBase: base?.p02 ?? null,
+        p02MesComparado: compared?.p02 ?? null,
+        p03MesBase: base?.p03 ?? null,
+        p03MesComparado: compared?.p03 ?? null,
+        p06MesBase: base?.p06 ?? null,
+        p06MesComparado: compared?.p06 ?? null,
+        p7MesBase: base?.p7 ?? null,
+        p7MesComparado: compared?.p7 ?? null,
+        diferencias: comparison?.metrics || null
+      };
+      console.log("Validación comparativa mensual", output);
+      return output;
+    }
+
+    function activeFiltersSummary() {
+      return {
+        zonas: getMultiValues("zoneFilter"),
+        centros: getMultiValues("centerFilter"),
+        profesionales: getMultiValues("professionalFilter"),
+        categoria: $("categoryFilter").value,
+        tipoVisita: $("visitFilter").value,
+        desde: $("fromDate").value || META.dateMin,
+        hasta: $("toDate").value || META.dateMax
+      };
+    }
+
+    function comparisonStatus(delta, improvesWhen) {
+      if (Math.abs(delta) < 0.0001) return "neutral";
+      const improves = improvesWhen === "down" ? delta < 0 : delta > 0;
+      return improves ? "good" : "bad";
+    }
+
+    function statusText(status) {
+      if (status === "good") return "Mejora";
+      if (status === "bad") return "Empeora";
+      return "Sin cambios";
+    }
+
+    function statusClass(status) {
+      if (status === "good") return "good";
+      if (status === "bad") return "bad";
+      return "";
+    }
+
+    function deltaClass(delta, improvesWhen) {
+      const status = comparisonStatus(delta, improvesWhen);
+      if (status === "good") return "delta-good";
+      if (status === "bad") return "delta-bad";
+      return "delta-neutral";
+    }
+
+    function statusBadge(delta, improvesWhen) {
+      const status = comparisonStatus(delta, improvesWhen);
+      return `<span class="status-pill ${statusClass(status)}">${statusText(status)}</span>`;
+    }
+
+    function formatMetricValue(value, type) {
+      return type === "percent" ? pctFmt.format(value) : fmt.format(value);
+    }
+
+    function formatComparisonDelta(metric) {
+      const sign = metric.delta > 0 ? "+" : "";
+      if (metric.type === "percent") return `<span class="${deltaClass(metric.delta, metric.key === "p7" ? "down" : "up")}">${sign}${pctFmt.format(metric.delta)} pp</span>`;
+      const pct = metric.percentage === null ? "" : ` (${sign}${pctFmt.format(metric.percentage)}%)`;
+      return `<span class="${deltaClass(metric.delta, "down")}">${sign}${fmt.format(metric.delta)} d${pct}</span>`;
+    }
+
+    function formatSigned(value) {
+      const sign = value > 0 ? "+" : "";
+      return `${sign}${fmt.format(value)}`;
+    }
+
+    function formatNullable(value) {
+      return Number.isFinite(value) ? fmt.format(value) : "-";
+    }
+
+    function formatPercentVariation(value) {
+      if (value === null || !Number.isFinite(value)) return "No calculable";
+      const sign = value > 0 ? "+" : "";
+      return `${sign}${pctFmt.format(value)}%`;
+    }
+
+    function monthWithPartial(monthItem) {
+      return `${escapeHtml(monthItem.label)}${monthItem.partial ? ' <span class="partial-tag">Mes parcial</span>' : ""}`;
+    }
+
+    function metricValueFromRow(row, metricKey) {
+      const config = monthlyMetricConfig[metricKey];
+      return config.value(row);
+    }
+
+    function sortProfessionalRows(rows, sortMode) {
+      if (sortMode === "worsening") return rows.sort((a, b) => b.delta - a.delta);
+      if (sortMode === "improvement") return rows.sort((a, b) => a.delta - b.delta);
+      if (sortMode === "p7") return rows.sort((a, b) => b.compared.p7 - a.compared.p7);
+      return rows.sort((a, b) => b.compared.mean - a.compared.mean);
+    }
+
+    function drawMonthlyMetricChart(svg, data, config, baseMonth, comparedMonth) {
+      const width = svg.clientWidth || 900;
+      const height = svg.clientHeight || 320;
+      const margin = { top: 22, right: 24, bottom: 52, left: 54 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+      const maxY = Math.max(...data.map(d => d.value), 1);
+      const yTop = config.type === "percent" ? Math.min(100, Math.ceil(maxY + 8)) : Math.ceil(maxY + 1);
+      const xScale = index => data.length === 1 ? margin.left + innerW / 2 : margin.left + (index / (data.length - 1)) * innerW;
+      const yScale = value => margin.top + innerH - (value / yTop) * innerH;
+      const points = data.map((d, index) => `${xScale(index)},${yScale(d.value)}`).join(" ");
+      const yTicks = [0, Math.round(yTop / 2), yTop];
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.innerHTML = `
+        <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"></rect>
+        ${yTicks.map(t => `<g><line x1="${margin.left}" x2="${width - margin.right}" y1="${yScale(t)}" y2="${yScale(t)}" stroke="#e6edf5"></line><text x="${margin.left - 10}" y="${yScale(t) + 4}" text-anchor="end" font-size="12" fill="#637083">${fmt.format(t)}${config.suffix}</text></g>`).join("")}
+        <polyline fill="none" stroke="#008c7a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="${points}"></polyline>
+        ${data.map((d, index) => {
+          const selected = d.month === baseMonth || d.month === comparedMonth;
+          return `<circle cx="${xScale(index)}" cy="${yScale(d.value)}" r="${selected ? 5 : 3.5}" fill="${d.month === baseMonth ? "#1d3573" : d.month === comparedMonth ? "#c73e4b" : "#008c7a"}" data-tip="${escapeHtml(d.label)}${d.partial ? " · mes parcial" : ""}: ${fmt.format(d.value)}${config.suffix}"></circle>`;
+        }).join("")}
+        ${data.map((d, index) => `<text x="${xScale(index)}" y="${height - 16}" text-anchor="middle" font-size="11" fill="#637083">${escapeHtml(d.label)}</text>`).join("")}
+      `;
+      attachTips(svg);
+    }
+
+    function drawHeadToHeadChart(svg, metrics) {
+      const width = svg.clientWidth || 540;
+      const height = svg.clientHeight || 320;
+      const margin = { top: 18, right: 28, bottom: 22, left: 118 };
+      const rowH = (height - margin.top - margin.bottom) / metrics.length;
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.innerHTML = `
+        <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"></rect>
+        ${metrics.map((metric, index) => {
+          const y = margin.top + index * rowH + 8;
+          const max = Math.max(metric.baseValue, metric.comparedValue, 1);
+          const baseW = ((metric.baseValue / max) * (width - margin.left - margin.right)) / 2;
+          const comparedW = ((metric.comparedValue / max) * (width - margin.left - margin.right)) / 2;
+          return `<g>
+            <text x="${margin.left - 10}" y="${y + 20}" text-anchor="end" font-size="12" fill="#17233c">${escapeHtml(metric.label)}</text>
+            <rect x="${margin.left}" y="${y}" width="${baseW}" height="13" rx="4" fill="#1d3573" data-tip="${escapeHtml(metric.label)} base: ${fmt.format(metric.baseValue)}${metric.suffix}"></rect>
+            <rect x="${margin.left}" y="${y + 17}" width="${comparedW}" height="13" rx="4" fill="#008c7a" data-tip="${escapeHtml(metric.label)} comparado: ${fmt.format(metric.comparedValue)}${metric.suffix}"></rect>
+            <text x="${margin.left + baseW + 6}" y="${y + 11}" font-size="11" fill="#637083">${fmt.format(metric.baseValue)}${metric.suffix}</text>
+            <text x="${margin.left + comparedW + 6}" y="${y + 28}" font-size="11" fill="#637083">${fmt.format(metric.comparedValue)}${metric.suffix}</text>
+          </g>`;
+        }).join("")}
+      `;
+      attachTips(svg);
+    }
+
+    function drawGroupedComparisonChart(svg, rows, metricKey, labelName) {
+      const config = monthlyMetricConfig[metricKey];
+      const data = rows.slice(0, 12).map(row => ({
+        label: row.label.replaceAll("|||", " · "),
+        base: metricValueFromRow(row.base, metricKey),
+        compared: metricValueFromRow(row.compared, metricKey)
+      }));
+      const width = svg.clientWidth || 900;
+      const height = svg.clientHeight || 260;
+      const margin = { top: 18, right: 20, bottom: 54, left: 48 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+      const max = Math.max(...data.flatMap(d => [d.base, d.compared]), 1);
+      const groupW = innerW / Math.max(1, data.length);
+      const barW = Math.max(8, Math.min(24, groupW / 3));
+      const yScale = value => margin.top + innerH - (value / max) * innerH;
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.innerHTML = `
+        <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"></rect>
+        ${[0, Math.round(max / 2), Math.ceil(max)].map(t => `<g><line x1="${margin.left}" x2="${width - margin.right}" y1="${yScale(t)}" y2="${yScale(t)}" stroke="#e6edf5"></line><text x="${margin.left - 8}" y="${yScale(t) + 4}" text-anchor="end" font-size="12" fill="#637083">${fmt.format(t)}${config.suffix}</text></g>`).join("")}
+        ${data.map((d, index) => {
+          const x = margin.left + index * groupW + groupW / 2 - barW;
+          const baseH = margin.top + innerH - yScale(d.base);
+          const compH = margin.top + innerH - yScale(d.compared);
+          return `<g>
+            <rect x="${x}" y="${yScale(d.base)}" width="${barW}" height="${baseH}" rx="4" fill="#1d3573" data-tip="${escapeHtml(labelName)} ${escapeHtml(d.label)} base: ${fmt.format(d.base)}${config.suffix}"></rect>
+            <rect x="${x + barW + 4}" y="${yScale(d.compared)}" width="${barW}" height="${compH}" rx="4" fill="#008c7a" data-tip="${escapeHtml(labelName)} ${escapeHtml(d.label)} comparado: ${fmt.format(d.compared)}${config.suffix}"></rect>
+            <text x="${x + barW}" y="${height - 18}" text-anchor="middle" font-size="10" fill="#637083">${escapeHtml(shortLabel(d.label))}</text>
+          </g>`;
+        }).join("")}
+      `;
+      attachTips(svg);
+    }
+
     function runMonthlyEvolutionSelfTest() {
       const rows = [
         { fecha: "2026-02-01", dias: 100, categoria: "A", tipo: "T", cias: "1", profesional: "P1", centro: "C", zona: "Z" },
@@ -1365,6 +2238,7 @@
       renderHeatmap(rows);
       renderDistribution(rows);
       renderRanking(rows);
+      renderMonthlyComparisonTab(rows);
     }
 
     function renderEmpty() {
@@ -1384,6 +2258,7 @@
       $("kpiLatestSub").textContent = RAW_DATA.length ? "Corte DD/MM/AAAA" : "Corte DD/MM/AAAA";
       $("kpiDeltaSub").textContent = RAW_DATA.length ? "Mes final del filtro frente al mes inicial del filtro" : "Pendiente de carga de Excel";
       $("evolutionKpi").title = "Compara la demora media del mes inicial con la demora media del mes final, usando el mes final completo o parcial si aún no ha terminado.";
+      renderMonthlyComparisonTab([]);
     }
 
     function renderKpis(rows) {
@@ -1795,6 +2670,7 @@
     window.addEventListener("resize", debounce(render, 160));
     runMonthlyEvolutionSelfTest();
     window.validateKpiCalculations = validateKpiCalculations;
+    window.validateMonthlyComparison = validateMonthlyComparison;
     setupFilters();
     render();
   </script>
