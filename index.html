@@ -1190,6 +1190,14 @@
       p7: { label: "% 7 o más días", suffix: "%", type: "percent", value: m => m.p7, improvesWhen: "down" },
       max: { label: "Demora máxima", suffix: " d", type: "days", value: m => m.max, improvesWhen: "down" }
     };
+    const trendStatusKeyMap = {
+      mean: "demoraMedia",
+      max: "demoraMaxima",
+      p7: "p7omas",
+      p02: "p02",
+      p03: "p03",
+      p06: "p06"
+    };
 
     const $ = (id) => document.getElementById(id);
     const mean = (rows) => rows.length ? rows.reduce((a, r) => a + r.dias, 0) / rows.length : 0;
@@ -1787,7 +1795,7 @@
           comparedValue,
           delta,
           percentage: baseValue ? (delta / baseValue) * 100 : null,
-          status: comparisonStatus(delta, config.improvesWhen)
+          trend: getTrendStatus(trendStatusKeyMap[key] || key, baseValue, comparedValue)
         };
       });
       return result;
@@ -1847,7 +1855,7 @@
           <span>${escapeHtml(metric.label)}</span>
           <strong>${formatComparisonDelta(metric)}</strong>
           <small>${formatMetricValue(metric.baseValue, metric.type)}${metric.suffix} → ${formatMetricValue(metric.comparedValue, metric.type)}${metric.suffix}</small>
-          <small><span class="status-pill ${statusClass(metric.status)}">${statusText(metric.status)}</span></small>
+          <small><span class="status-pill ${statusClass(metric.trend.status)}">${escapeHtml(metric.trend.label)}</span></small>
         </article>
       `).join("");
     }
@@ -2032,6 +2040,39 @@
       return output;
     }
 
+    function validateTrendStatus() {
+      const tests = [
+        { name: "Demora media baja", metricKey: "demoraMedia", base: 6.8, compared: 4.3, expected: "good" },
+        { name: "Porcentaje 0-2 sube", metricKey: "p02", base: 21.9, compared: 34.2, expected: "good" },
+        { name: "Porcentaje 0-3 sube", metricKey: "p03", base: 24.0, compared: 41.3, expected: "good" },
+        { name: "Porcentaje 0-6 sube", metricKey: "p06", base: 42.9, compared: 74.2, expected: "good" },
+        { name: "Porcentaje 7 o más baja", metricKey: "p7omas", base: 57.1, compared: 25.8, expected: "good" },
+        { name: "Demora máxima baja", metricKey: "demoraMaxima", base: 16.0, compared: 14.0, expected: "good" },
+        { name: "Porcentaje 0-2 baja", metricKey: "p02", base: 34.2, compared: 21.9, expected: "bad" },
+        { name: "Porcentaje 0-3 baja", metricKey: "p03", base: 41.3, compared: 24.0, expected: "bad" },
+        { name: "Porcentaje 0-6 baja", metricKey: "p06", base: 74.2, compared: 42.9, expected: "bad" },
+        { name: "Porcentaje 7 o más sube", metricKey: "p7omas", base: 25.8, compared: 57.1, expected: "bad" },
+        { name: "Demora media sube", metricKey: "demoraMedia", base: 4.3, compared: 6.8, expected: "bad" },
+        { name: "Demora máxima sube", metricKey: "demoraMaxima", base: 14.0, compared: 16.0, expected: "bad" },
+        { name: "Sin cambios", metricKey: "demoraMedia", base: 5, compared: 5, expected: "neutral" }
+      ];
+      const results = tests.map(test => {
+        const result = getTrendStatus(test.metricKey, test.base, test.compared);
+        return {
+          prueba: test.name,
+          indicador: test.metricKey,
+          base: test.base,
+          comparado: test.compared,
+          esperado: test.expected,
+          obtenido: result.status,
+          etiqueta: result.label,
+          resultado: result.status === test.expected ? "PASS" : "FAIL"
+        };
+      });
+      console.table(results);
+      return results;
+    }
+
     function activeFiltersSummary() {
       return {
         zonas: getMultiValues("zoneFilter"),
@@ -2044,16 +2085,18 @@
       };
     }
 
-    function comparisonStatus(delta, improvesWhen) {
-      if (Math.abs(delta) < 0.0001) return "neutral";
-      const improves = improvesWhen === "down" ? delta < 0 : delta > 0;
-      return improves ? "good" : "bad";
-    }
-
-    function statusText(status) {
-      if (status === "good") return "Mejora";
-      if (status === "bad") return "Empeora";
-      return "Sin cambios";
+    function getTrendStatus(metricKey, baseValue, comparedValue) {
+      const delta = comparedValue - baseValue;
+      if (Math.abs(delta) < 0.0001) return { status: "neutral", label: "SIN CAMBIOS" };
+      const lowerIsBetter = ["demoraMedia", "demoraMaxima", "p7omas", "mean", "max", "p7"];
+      const higherIsBetter = ["p02", "p03", "p06"];
+      if (lowerIsBetter.includes(metricKey)) {
+        return delta < 0 ? { status: "good", label: "MEJORA" } : { status: "bad", label: "EMPEORA" };
+      }
+      if (higherIsBetter.includes(metricKey)) {
+        return delta > 0 ? { status: "good", label: "MEJORA" } : { status: "bad", label: "EMPEORA" };
+      }
+      return { status: "neutral", label: "REVISAR" };
     }
 
     function statusClass(status) {
@@ -2063,15 +2106,17 @@
     }
 
     function deltaClass(delta, improvesWhen) {
-      const status = comparisonStatus(delta, improvesWhen);
-      if (status === "good") return "delta-good";
-      if (status === "bad") return "delta-bad";
+      const metricKey = improvesWhen === "up" ? "p02" : "demoraMedia";
+      const trend = getTrendStatus(metricKey, 0, delta);
+      if (trend.status === "good") return "delta-good";
+      if (trend.status === "bad") return "delta-bad";
       return "delta-neutral";
     }
 
     function statusBadge(delta, improvesWhen) {
-      const status = comparisonStatus(delta, improvesWhen);
-      return `<span class="status-pill ${statusClass(status)}">${statusText(status)}</span>`;
+      const metricKey = improvesWhen === "up" ? "p02" : "demoraMedia";
+      const trend = getTrendStatus(metricKey, 0, delta);
+      return `<span class="status-pill ${statusClass(trend.status)}">${trend.label}</span>`;
     }
 
     function formatMetricValue(value, type) {
@@ -2080,9 +2125,10 @@
 
     function formatComparisonDelta(metric) {
       const sign = metric.delta > 0 ? "+" : "";
-      if (metric.type === "percent") return `<span class="${deltaClass(metric.delta, metric.key === "p7" ? "down" : "up")}">${sign}${pctFmt.format(metric.delta)} pp</span>`;
+      const colorClass = metric.trend.status === "good" ? "delta-good" : metric.trend.status === "bad" ? "delta-bad" : "delta-neutral";
+      if (metric.type === "percent") return `<span class="${colorClass}">${sign}${pctFmt.format(metric.delta)} pp</span>`;
       const pct = metric.percentage === null ? "" : ` (${sign}${pctFmt.format(metric.percentage)}%)`;
-      return `<span class="${deltaClass(metric.delta, "down")}">${sign}${fmt.format(metric.delta)} d${pct}</span>`;
+      return `<span class="${colorClass}">${sign}${fmt.format(metric.delta)} d${pct}</span>`;
     }
 
     function formatSigned(value) {
@@ -2671,6 +2717,7 @@
     runMonthlyEvolutionSelfTest();
     window.validateKpiCalculations = validateKpiCalculations;
     window.validateMonthlyComparison = validateMonthlyComparison;
+    window.validateTrendStatus = validateTrendStatus;
     setupFilters();
     render();
   </script>
