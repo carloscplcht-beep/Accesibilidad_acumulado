@@ -1849,14 +1849,6 @@
     function renderComparisonSummary(comparison) {
       $("comparisonSummary").innerHTML = Object.values(comparison.metrics).map(metric => {
         const trend = getTrendStatus(metric.key, metric.baseValue, metric.comparedValue);
-        console.table({
-          key: metric.key,
-          label: metric.label,
-          base: metric.baseValue,
-          compared: metric.comparedValue,
-          delta: metric.comparedValue - metric.baseValue,
-          trend: trend.label
-        });
         return `
           <article class="comparison-card">
             <span>${escapeHtml(metric.label)}</span>
