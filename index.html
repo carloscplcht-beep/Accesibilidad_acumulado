@@ -1183,12 +1183,12 @@
     const longDateFmt = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
     const palette = ["#008c7a", "#1d3573", "#e5aa21", "#c73e4b", "#2f9e44", "#7c3aed"];
     const monthlyMetricConfig = {
-      mean: { label: "Demora media", suffix: " d", type: "days", value: m => m.mean, improvesWhen: "down" },
-      p02: { label: "% 0-2 días", suffix: "%", type: "percent", value: m => m.p02, improvesWhen: "up" },
-      p03: { label: "% 0-3 días", suffix: "%", type: "percent", value: m => m.p03, improvesWhen: "up" },
-      p06: { label: "% 0-6 días", suffix: "%", type: "percent", value: m => m.p06, improvesWhen: "up" },
-      p7: { label: "% 7 o más días", suffix: "%", type: "percent", value: m => m.p7, improvesWhen: "down" },
-      max: { label: "Demora máxima", suffix: " d", type: "days", value: m => m.max, improvesWhen: "down" }
+      mean: { label: "Demora media", suffix: " d", type: "days", value: m => m.mean },
+      p02: { label: "% 0-2 días", suffix: "%", type: "percent", value: m => m.p02 },
+      p03: { label: "% 0-3 días", suffix: "%", type: "percent", value: m => m.p03 },
+      p06: { label: "% 0-6 días", suffix: "%", type: "percent", value: m => m.p06 },
+      p7: { label: "% 7 o más días", suffix: "%", type: "percent", value: m => m.p7 },
+      max: { label: "Demora máxima", suffix: " d", type: "days", value: m => m.max }
     };
     const $ = (id) => document.getElementById(id);
     const mean = (rows) => rows.length ? rows.reduce((a, r) => a + r.dias, 0) / rows.length : 0;
@@ -2048,12 +2048,12 @@
         ["demoraMaxima", 15, 12, "MEJORA"],
         ["p7omas", 20, 40, "EMPEORA"],
         ["p7omas", 40, 20, "MEJORA"],
-        ["p02", 70, 60, "EMPEORA"],
-        ["p02", 60, 70, "MEJORA"],
-        ["p03", 80, 75, "EMPEORA"],
-        ["p03", 75, 80, "MEJORA"],
-        ["p06", 90, 85, "EMPEORA"],
-        ["p06", 85, 90, "MEJORA"]
+        ["p02", 70, 60, "MEJORA"],
+        ["p02", 60, 70, "EMPEORA"],
+        ["p03", 80, 75, "MEJORA"],
+        ["p03", 75, 80, "EMPEORA"],
+        ["p06", 90, 85, "MEJORA"],
+        ["p06", 85, 90, "EMPEORA"]
       ];
 
       tests.forEach(([key, base, compared, expected]) => {
@@ -2084,33 +2084,25 @@
     }
 
     function getTrendStatus(metricKey, baseValue, comparedValue) {
-      const delta = comparedValue - baseValue;
-
       if (!Number.isFinite(baseValue) || !Number.isFinite(comparedValue)) {
         return { status: 'neutral', label: 'NO CALCULABLE' };
       }
+
+      const delta = comparedValue - baseValue;
 
       if (Math.abs(delta) < 0.0001) {
         return { status: 'neutral', label: 'SIN CAMBIOS' };
       }
 
-      const lowerIsBetter = ['demoraMedia', 'demoraMaxima', 'p7omas'];
-      const higherIsBetter = ['p02', 'p03', 'p06'];
-
-      if (lowerIsBetter.includes(metricKey)) {
-        return delta < 0
-          ? { status: 'good', label: 'MEJORA' }
-          : { status: 'bad', label: 'EMPEORA' };
+      if (delta > 0) {
+        return { status: 'bad', label: 'EMPEORA' };
       }
 
-      if (higherIsBetter.includes(metricKey)) {
-        return delta > 0
-          ? { status: 'good', label: 'MEJORA' }
-          : { status: 'bad', label: 'EMPEORA' };
+      if (delta < 0) {
+        return { status: 'good', label: 'MEJORA' };
       }
 
-      console.warn('Metric key no reconocido:', metricKey);
-      return { status: 'neutral', label: 'REVISAR' };
+      return { status: 'neutral', label: 'SIN CAMBIOS' };
     }
 
     function statusClass(status) {
@@ -2119,17 +2111,15 @@
       return "";
     }
 
-    function deltaClass(delta, improvesWhen) {
-      const metricKey = improvesWhen === "up" ? "p02" : "demoraMedia";
-      const trend = getTrendStatus(metricKey, 0, delta);
+    function deltaClass(delta) {
+      const trend = getTrendStatus("demoraMedia", 0, delta);
       if (trend.status === "good") return "delta-good";
       if (trend.status === "bad") return "delta-bad";
       return "delta-neutral";
     }
 
-    function statusBadge(delta, improvesWhen) {
-      const metricKey = improvesWhen === "up" ? "p02" : "demoraMedia";
-      const trend = getTrendStatus(metricKey, 0, delta);
+    function statusBadge(delta) {
+      const trend = getTrendStatus("demoraMedia", 0, delta);
       return `<span class="status-pill ${statusClass(trend.status)}">${trend.label}</span>`;
     }
 
