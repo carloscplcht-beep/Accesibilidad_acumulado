@@ -838,6 +838,9 @@
     </nav>
 
     <section class="filters" aria-label="Filtros del dashboard">
+      <label>Área de Salud
+        <select id="areaFilter"></select>
+      </label>
       <div class="filter-field">
         <span class="field-label">Zona básica de salud</span>
         <div id="zoneFilter" class="multi-select"></div>
@@ -1172,7 +1175,7 @@
 
   <script>
     const EMBEDDED_DATA = [];
-    const EMBEDDED_META = {"source":"","generated":"","rows":0,"dateMin":"","dateMax":"","centro":"","zona":"","area":"","categorias":[],"tipos":[]};
+    const EMBEDDED_META = {"source":"","generated":"","rows":0,"dateMin":"","dateMax":"","centro":"","zona":"","areaSalud":"","areaSaludAvailable":false,"areasSalud":[],"categorias":[],"tipos":[]};
     let RAW_DATA = EMBEDDED_DATA;
     let META = EMBEDDED_META;
 
@@ -1230,6 +1233,10 @@
         refreshFilterOptions();
         render();
       });
+      $("areaFilter").addEventListener("change", () => {
+        refreshDependentFilterOptions();
+        render();
+      });
       ["categoryFilter", "visitFilter", "fromDate", "toDate"].forEach(id => $(id).addEventListener("change", render));
       $("granDaily").addEventListener("click", () => setGranularity("daily"));
       $("granWeekly").addEventListener("click", () => setGranularity("weekly"));
@@ -1256,16 +1263,15 @@
     function refreshFilterOptions() {
       $("subtitle").textContent = RAW_DATA.length ? `${META.centro} · ${META.zona}` : "Sin datos cargados";
       $("sourceName").textContent = META.source || "sin archivo cargado";
-      createMultiSelect("zoneFilter", uniqueSorted(RAW_DATA.map(r => r.zona)), "Todas");
-      createMultiSelect("centerFilter", uniqueSorted(RAW_DATA.map(r => r.centro)), "Todos");
-      createMultiSelect("professionalFilter", uniqueSorted(RAW_DATA.map(r => `${r.profesional} · ${r.cias}`)), "Todos");
-      fillSelect($("categoryFilter"), ["Todas", ...uniqueSorted(RAW_DATA.map(r => r.categoria))]);
-      fillSelect($("visitFilter"), ["Todos", ...uniqueSorted(RAW_DATA.map(r => r.tipo))]);
+      refreshAreaFilter();
+      refreshDependentFilterOptions();
       $("fromDate").value = META.dateMin || "";
       $("toDate").value = META.dateMax || "";
     }
 
     function resetAllFilters() {
+      $("areaFilter").value = $("areaFilter").disabled ? "No disponible" : "Todas";
+      refreshDependentFilterOptions();
       resetMultiSelect("zoneFilter");
       resetMultiSelect("centerFilter");
       resetMultiSelect("professionalFilter");
@@ -1275,6 +1281,54 @@
       $("toDate").value = META.dateMax || "";
     }
 
+    function refreshAreaFilter() {
+      const select = $("areaFilter");
+      const previous = select.value || "Todas";
+      const areas = availableAreasSalud();
+      if (!META.areaSaludAvailable || !areas.length) {
+        fillSelect(select, ["No disponible"]);
+        select.value = "No disponible";
+        select.disabled = true;
+        return;
+      }
+      const values = ["Todas", ...areas];
+      fillSelect(select, values);
+      select.disabled = false;
+      select.value = values.includes(previous) ? previous : "Todas";
+    }
+
+    function refreshDependentFilterOptions() {
+      const rows = areaScopedRows();
+      createMultiSelect("zoneFilter", uniqueSorted(rows.map(r => r.zona)), "Todas", getMultiValues("zoneFilter"));
+      createMultiSelect("centerFilter", uniqueSorted(rows.map(r => r.centro)), "Todos", getMultiValues("centerFilter"));
+      createMultiSelect("professionalFilter", uniqueSorted(rows.map(r => `${r.profesional} · ${r.cias}`)), "Todos", getMultiValues("professionalFilter"));
+      preserveSelectValue("categoryFilter", ["Todas", ...uniqueSorted(rows.map(r => r.categoria))], "Todas");
+      preserveSelectValue("visitFilter", ["Todos", ...uniqueSorted(rows.map(r => r.tipo))], "Todos");
+    }
+
+    function preserveSelectValue(id, values, fallback) {
+      const select = $(id);
+      const previous = select.value || fallback;
+      fillSelect(select, values);
+      select.value = values.includes(previous) ? previous : fallback;
+    }
+
+    function selectedAreaSalud() {
+      const select = $("areaFilter");
+      if (!select || select.disabled) return "Todas";
+      return select.value || "Todas";
+    }
+
+    function availableAreasSalud() {
+      return uniqueSorted(RAW_DATA.map(row => row.areaSalud));
+    }
+
+    function areaScopedRows() {
+      const areaSalud = selectedAreaSalud();
+      if (areaSalud === "Todas") return RAW_DATA;
+      return RAW_DATA.filter(row => row.areaSalud === areaSalud);
+    }
+
     function setGranularity(value) {
       activeGranularity = value;
       $("granDaily").classList.toggle("active", value === "daily");
@@ -1282,14 +1336,15 @@
       render();
     }
 
-    function createMultiSelect(id, values, allLabel) {
+    function createMultiSelect(id, values, allLabel, selectedValues = []) {
       const root = $(id);
       const allValue = "__all__";
+      const validSelected = selectedValues.filter(value => values.includes(value));
       root.innerHTML = `
         <button class="multi-button" type="button" aria-haspopup="listbox">${escapeHtml(allLabel)}</button>
         <div class="multi-menu" role="listbox">
-          <label class="multi-option"><input type="checkbox" value="${allValue}" checked><span>${escapeHtml(allLabel)}</span></label>
-          ${values.map(value => `<label class="multi-option"><input type="checkbox" value="${escapeHtml(value)}"><span>${escapeHtml(value)}</span></label>`).join("")}
+          <label class="multi-option"><input type="checkbox" value="${allValue}" ${validSelected.length ? "" : "checked"}><span>${escapeHtml(allLabel)}</span></label>
+          ${values.map(value => `<label class="multi-option"><input type="checkbox" value="${escapeHtml(value)}" ${validSelected.includes(value) ? "checked" : ""}><span>${escapeHtml(value)}</span></label>`).join("")}
         </div>
       `;
       root.querySelector(".multi-button").addEventListener("click", (event) => {
@@ -1314,6 +1369,7 @@
           render();
         });
       });
+      updateMultiLabel(id, allLabel);
     }
 
     function resetMultiSelect(id) {
@@ -1509,7 +1565,7 @@
         return index;
       };
       const idx = {
-        area: optionalIndex(headers, "area"),
+        areaSalud: optionalIndex(headers, "Área de Salud", "Area de Salud", "AREA DE SALUD", "ÁREA SALUD", "AREA SALUD", "Gerencia", "Área", "Area"),
         zona: getIndex("Zona"),
         centro: getIndex("Centro"),
         cias: getIndex("CIAS"),
@@ -1525,7 +1581,7 @@
         const fecha = formatExcelDate(row[idx.fecha]);
         if (!Number.isFinite(dias) || !fecha) return null;
         return {
-          area: cleanValue(row[idx.area]) || "",
+          areaSalud: idx.areaSalud >= 0 ? cleanValue(row[idx.areaSalud]) : "",
           zona: cleanValue(row[idx.zona]),
           centro: cleanValue(row[idx.centro]),
           cias: cleanValue(row[idx.cias]),
@@ -1541,6 +1597,9 @@
       const dates = uniqueSorted(records.map(row => row.fecha));
       const zonas = uniqueSorted(records.map(row => row.zona));
       const centros = uniqueSorted(records.map(row => row.centro));
+      const areasSalud = uniqueSorted(records.map(row => row.areaSalud));
+      const areaSaludAvailable = idx.areaSalud >= 0 && areasSalud.length > 0;
+      if (!areaSaludAvailable) console.warn("No se ha detectado columna de Área de Salud en el Excel.");
       return {
         records,
         meta: {
@@ -1551,7 +1610,9 @@
           dateMax: dates[dates.length - 1],
           centro: centros.length === 1 ? centros[0] : `${centros.length} centros`,
           zona: zonas.length === 1 ? zonas[0] : `${zonas.length} zonas básicas`,
-          area: records[0].area || "",
+          areaSalud: areasSalud.length === 1 ? areasSalud[0] : "",
+          areaSaludAvailable,
+          areasSalud,
           categorias: uniqueSorted(records.map(row => row.categoria)),
           tipos: uniqueSorted(records.map(row => row.tipo))
         }
@@ -1562,8 +1623,9 @@
       return String(value ?? "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ");
     }
 
-    function optionalIndex(headers, name) {
-      return headers.findIndex(header => header === normalizeHeader(name));
+    function optionalIndex(headers, ...names) {
+      const normalized = names.map(normalizeHeader);
+      return headers.findIndex(header => normalized.includes(header));
     }
 
     function cleanValue(value) {
@@ -1604,6 +1666,7 @@
     }
 
     function filteredRows() {
+      const areaSalud = selectedAreaSalud();
       const zones = getMultiValues("zoneFilter");
       const centers = getMultiValues("centerFilter");
       const professionals = getMultiValues("professionalFilter");
@@ -1612,6 +1675,7 @@
       const from = $("fromDate").value || META.dateMin;
       const to = $("toDate").value || META.dateMax;
       return RAW_DATA.filter((row) => {
+        if (areaSalud !== "Todas" && row.areaSalud !== areaSalud) return false;
         if (zones.length && !zones.includes(row.zona)) return false;
         if (centers.length && !centers.includes(row.centro)) return false;
         if (professionals.length && !professionals.includes(`${row.profesional} · ${row.cias}`)) return false;
@@ -1675,6 +1739,9 @@
       const rows = filteredRows();
       const metrics = calculateKpiMetrics(rows);
       const output = {
+        areaSaludSeleccionada: selectedAreaSalud(),
+        registrosTrasAplicarAreaSalud: areaScopedRows().length,
+        areasSaludDisponibles: availableAreasSalud(),
         numeroRegistrosFiltrados: metrics.numeroRegistrosFiltrados,
         fechaInicialFiltrada: metrics.fechaInicialFiltrada,
         fechaFinalFiltrada: metrics.fechaFinalFiltrada,
@@ -2017,6 +2084,9 @@
       const comparison = calculateComparisonMetrics(base, compared);
       const output = {
         filtrosActivos: activeFiltersSummary(),
+        areaSaludSeleccionada: selectedAreaSalud(),
+        registrosTrasAplicarAreaSalud: areaScopedRows().length,
+        areasSaludDisponibles: availableAreasSalud(),
         mesesDisponibles: monthly.map(item => item.month),
         mesBase: base?.month || "",
         mesComparado: compared?.month || "",
@@ -2073,6 +2143,7 @@
 
     function activeFiltersSummary() {
       return {
+        areaSalud: selectedAreaSalud(),
         zonas: getMultiValues("zoneFilter"),
         centros: getMultiValues("centerFilter"),
         profesionales: getMultiValues("professionalFilter"),
