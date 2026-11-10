@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">accesibilidad media AP</string>
+    <string name="dashboard_url">https://carloscplcht-beep.github.io/Accesibilidad_acumulado/</string>
+    <string name="load_error">No se puede cargar el dashboard. Comprueba la conexión.</string>
+    <string name="retry">Reintentar</string>
+    <string name="print_error">No se ha podido abrir el informe. Carga el Excel y vuelve a intentarlo.</string>
+</resources>
